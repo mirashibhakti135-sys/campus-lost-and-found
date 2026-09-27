@@ -135,80 +135,213 @@ const PAGE = `<!DOCTYPE html>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Campus Lost &amp; Found</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2314181c'/%3E%3Cpath d='M30 70 L30 34 Q30 26 38 26 L62 26 Q70 26 70 34 L70 70 L58 60 L50 70 L42 60 Z' fill='%23c79a3a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --paper: #eeece3; --paper-raised: #f7f5ee; --ink: #23262b; --ink-soft: #5c6067;
-  --line: #d8d4c7; --found: #2f6f6d; --found-bg: #e4efee; --lost: #b5502e; --lost-bg: #f6e7df;
-  --action: #e2b93b; --action-ink: #23262b; --radius: 4px;
-  --serif: Georgia, "Times New Roman", serif; --sans: -apple-system, "Segoe UI", sans-serif;
+  --bg: #f6f5f0;
+  --surface: #ffffff;
+  --ink: #14181c;
+  --ink-soft: #5b6470;
+  --ink-faint: #8b93a0;
+  --line: #e1ded4;
+  --lost: #7a3348;
+  --lost-bg: #f4e8ec;
+  --found: #1f6f5c;
+  --found-bg: #e4f1ec;
+  --gold: #b98a2e;
+  --gold-bg: #f7ecd3;
+  --gold-ink: #14181c;
+  --radius-sm: 6px;
+  --radius: 10px;
+  --shadow: 0 8px 24px -12px rgba(20, 24, 28, 0.18);
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); line-height: 1.5; }
-.wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
-header.site { border-bottom: 2px solid var(--ink); background: var(--paper-raised); }
-.site-inner { display: flex; align-items: baseline; justify-content: space-between; padding: 20px 24px; max-width: 980px; margin: 0 auto; flex-wrap: wrap; gap: 12px; }
-.brand { font-family: var(--serif); font-size: 1.5rem; font-weight: 600; color: var(--ink); }
-.brand span { color: var(--found); }
-nav.main a { text-decoration: none; color: var(--ink-soft); margin-left: 22px; font-size: 0.95rem; border-bottom: 2px solid transparent; padding-bottom: 2px; cursor: pointer; }
-nav.main a.active { color: var(--ink); border-bottom-color: var(--action); }
-main { padding: 48px 0 80px; }
-h1 { font-family: var(--serif); font-size: 2.1rem; line-height: 1.15; margin: 0 0 8px; }
-h2 { font-family: var(--serif); font-size: 1.4rem; margin: 0 0 16px; }
-p.lead { color: var(--ink-soft); max-width: 60ch; margin: 0 0 32px; }
-.btn { display: inline-block; border: 2px solid var(--ink); background: var(--ink); color: var(--paper-raised); padding: 10px 20px; border-radius: var(--radius); font-size: 0.95rem; cursor: pointer; text-decoration: none; }
-.btn.secondary { background: transparent; color: var(--ink); }
-.btn.action { background: var(--action); border-color: var(--action); color: var(--action-ink); font-weight: 600; }
-.btn.small { padding: 6px 12px; font-size: 0.85rem; }
-form.card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; max-width: 560px; }
+html { scroll-behavior: smooth; }
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 28px; }
+
+/* ---------- header ---------- */
+header.site {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(246, 245, 240, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.site-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px; max-width: 1040px; margin: 0 auto; gap: 16px; flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-mark {
+  width: 30px; height: 30px; border-radius: 8px; background: var(--ink);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.brand-mark svg { width: 16px; height: 16px; }
+.brand-name { font-family: var(--serif); font-size: 1.25rem; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+nav.main { display: flex; gap: 4px; }
+nav.main a {
+  text-decoration: none; color: var(--ink-soft); font-size: 0.92rem; font-weight: 500;
+  padding: 8px 14px; border-radius: 999px; cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+nav.main a:hover { background: var(--surface); color: var(--ink); }
+nav.main a.active { background: var(--ink); color: var(--bg); }
+
+main { padding: 56px 0 96px; }
+h1 { font-family: var(--serif); font-weight: 600; font-size: 2.5rem; line-height: 1.1; margin: 0 0 14px; letter-spacing: -0.015em; max-width: 18ch; }
+h2 { font-family: var(--serif); font-weight: 600; font-size: 1.5rem; margin: 0 0 18px; letter-spacing: -0.01em; }
+p.lead { color: var(--ink-soft); max-width: 56ch; font-size: 1.05rem; margin: 0 0 36px; }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border: 1.5px solid var(--ink); background: var(--ink); color: var(--bg);
+  padding: 11px 22px; border-radius: var(--radius-sm); font-size: 0.94rem; font-weight: 600;
+  font-family: var(--sans); cursor: pointer; text-decoration: none; transition: transform 0.12s, box-shadow 0.12s;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+.btn:active { transform: translateY(0); }
+.btn.secondary { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.secondary:hover { border-color: var(--ink); }
+.btn.action { background: var(--gold); border-color: var(--gold); color: var(--gold-ink); }
+.btn.small { padding: 7px 14px; font-size: 0.85rem; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ---------- forms ---------- */
+form.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 32px; max-width: 620px; box-shadow: var(--shadow);
+}
+.field-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+@media (min-width: 620px) { .field-grid.two { grid-template-columns: 1fr 1fr; } }
 .field { margin-bottom: 18px; }
-.field label { display: block; font-size: 0.85rem; color: var(--ink-soft); margin-bottom: 6px; }
-.field input, .field select, .field textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; font-size: 0.95rem; color: var(--ink); }
+.field-grid .field { margin-bottom: 0; }
+.field label { display: block; font-size: 0.83rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 7px; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 11px 13px; border: 1.5px solid var(--line); border-radius: var(--radius-sm);
+  background: #fff; font-family: var(--sans); font-size: 0.95rem; color: var(--ink); transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--ink); outline: none; }
 .field textarea { min-height: 90px; resize: vertical; }
-.toggle-row { display: flex; gap: 10px; margin-bottom: 22px; }
-.toggle-row button { flex: 1; padding: 12px; border: 2px solid var(--line); background: #fff; border-radius: var(--radius); cursor: pointer; font-weight: 600; }
+
+.toggle-row { display: flex; gap: 10px; margin-bottom: 26px; max-width: 620px; }
+.toggle-row button {
+  flex: 1; padding: 14px; border: 1.5px solid var(--line); background: var(--surface);
+  border-radius: var(--radius-sm); cursor: pointer; font-family: var(--sans); font-weight: 600; font-size: 0.92rem;
+  color: var(--ink-soft); transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
 .toggle-row button.is-lost.on { border-color: var(--lost); background: var(--lost-bg); color: var(--lost); }
 .toggle-row button.is-found.on { border-color: var(--found); background: var(--found-bg); color: var(--found); }
-.msg { margin-top: 16px; padding: 12px 14px; border-radius: var(--radius); font-size: 0.9rem; display: none; }
+
+.msg { margin-top: 18px; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.9rem; display: none; }
 .msg.ok { display: block; background: var(--found-bg); color: var(--found); }
 .msg.err { display: block; background: var(--lost-bg); color: var(--lost); }
-.filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
-.filters input, .filters select { padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
-.filters input[type="text"] { flex: 1; min-width: 200px; }
-.item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-.item-card { background: var(--paper-raised); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: var(--radius); padding: 18px; }
-.item-card.lost { border-left-color: var(--lost); }
-.item-card.found { border-left-color: var(--found); }
-.item-tag { display: inline-block; font-size: 0.72rem; padding: 2px 8px; border-radius: 3px; margin-bottom: 10px; }
+
+/* ---------- search / filters ---------- */
+.filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 30px; }
+.filters input, .filters select {
+  padding: 10px 14px; border: 1.5px solid var(--line); border-radius: var(--radius-sm);
+  font-family: var(--sans); background: var(--surface); font-size: 0.92rem;
+}
+.filters input[type="text"] { flex: 1; min-width: 220px; }
+
+/* ---------- item cards ---------- */
+.item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px; }
+.item-card {
+  background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--line);
+  border-radius: var(--radius); padding: 20px; transition: box-shadow 0.15s, transform 0.15s;
+}
+.item-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.item-card.lost { border-top-color: var(--lost); }
+.item-card.found { border-top-color: var(--found); }
+.item-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.item-tag { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
 .item-tag.lost { background: var(--lost-bg); color: var(--lost); }
 .item-tag.found { background: var(--found-bg); color: var(--found); }
-.item-tag.claimed { background: #eee3c6; color: #8a6d1d; }
-.item-tag.returned { background: #dde2e0; color: var(--ink-soft); }
-.item-card h3 { font-family: var(--serif); font-size: 1.1rem; margin: 0 0 6px; }
-.item-meta { font-size: 0.82rem; color: var(--ink-soft); margin: 0 0 10px; }
-.item-desc { font-size: 0.9rem; margin: 0 0 14px; }
-.empty-state { border: 1px dashed var(--line); border-radius: var(--radius); padding: 40px 20px; text-align: center; color: var(--ink-soft); }
-.workflow { display: flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin: 36px 0 44px; }
-.workflow div { flex: 1; min-width: 140px; padding: 16px 14px; border-right: 1px solid var(--line); background: var(--paper-raised); font-size: 0.85rem; }
-.workflow div b { display: block; font-family: var(--serif); font-size: 0.95rem; margin-bottom: 4px; }
-.stats { display: flex; gap: 28px; margin: 8px 0 36px; flex-wrap: wrap; }
-.stat b { display: block; font-family: var(--serif); font-size: 1.8rem; }
-.stat span { font-size: 0.8rem; color: var(--ink-soft); }
-table.admin { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-table.admin th, table.admin td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
-table.admin th { color: var(--ink-soft); font-weight: 500; font-size: 0.8rem; }
-.claim-note { background: #fff9e8; border: 1px solid var(--action); border-radius: var(--radius); padding: 10px 12px; font-size: 0.85rem; margin-top: 6px; }
-footer.site { border-top: 1px solid var(--line); padding: 24px; text-align: center; color: var(--ink-soft); font-size: 0.82rem; }
+.item-tag.claimed { background: var(--gold-bg); color: var(--gold); }
+.item-tag.returned { background: #e7e5df; color: var(--ink-soft); }
+.item-category { font-size: 0.78rem; color: var(--ink-faint); }
+.item-card h3 { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; margin: 0 0 8px; letter-spacing: -0.01em; }
+.item-desc { font-size: 0.9rem; color: var(--ink-soft); margin: 0 0 14px; }
+.item-meta-row { display: flex; gap: 16px; margin: 0 0 16px; }
+.meta-item { position: relative; padding-left: 0; font-size: 0.83rem; color: var(--ink-faint); }
+.meta-item + .meta-item { padding-left: 16px; }
+.meta-item + .meta-item::before {
+  content: ""; position: absolute; left: 0; top: 50%; width: 3px; height: 3px;
+  border-radius: 50%; background: var(--ink-faint); transform: translateY(-50%);
+}
+.claim-note {
+  background: var(--gold-bg); border-left: 3px solid var(--gold); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 10px 14px; font-size: 0.85rem; margin-top: 4px; color: var(--ink);
+}
+.empty-state {
+  grid-column: 1 / -1; border: 1.5px dashed var(--line); border-radius: var(--radius);
+  padding: 48px 24px; text-align: center; color: var(--ink-soft); background: var(--surface);
+}
+
+/* ---------- workflow (home) ---------- */
+.workflow { display: flex; flex-wrap: wrap; gap: 0; margin: 40px 0 48px; counter-reset: step; }
+.workflow div {
+  flex: 1; min-width: 150px; position: relative; padding: 24px 16px 16px; font-size: 0.85rem; color: var(--ink-soft);
+}
+.workflow div::before {
+  counter-increment: step; content: counter(step);
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: var(--bg);
+  font-family: var(--serif); font-weight: 600; font-size: 0.85rem; margin-bottom: 10px;
+}
+.workflow div::after {
+  content: ""; position: absolute; top: 38px; left: calc(50% + 26px); right: calc(-50% + 26px);
+  height: 1px; background: var(--line);
+}
+.workflow div:last-child::after { display: none; }
+.workflow div b { display: block; font-family: var(--sans); font-weight: 600; color: var(--ink); font-size: 0.92rem; margin-bottom: 4px; }
+
+.stats { display: flex; gap: 16px; margin: 8px 0 44px; flex-wrap: wrap; }
+.stat {
+  flex: 1; min-width: 140px; background: var(--surface); border: 1px solid var(--line);
+  border-top: 3px solid var(--line); border-radius: var(--radius); padding: 18px 20px;
+}
+.stat.active { border-top-color: var(--ink); }
+.stat.pending { border-top-color: var(--gold); }
+.stat.returned { border-top-color: var(--found); }
+.stat b { display: block; font-family: var(--serif); font-size: 2rem; font-weight: 600; }
+.stat span { font-size: 0.82rem; color: var(--ink-soft); }
+
+/* ---------- admin table ---------- */
+table.admin { width: 100%; border-collapse: collapse; font-size: 0.88rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+table.admin th, table.admin td { text-align: left; padding: 14px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.admin th { color: var(--ink-soft); font-weight: 600; font-size: 0.78rem; background: var(--bg); }
+table.admin tr:last-child td { border-bottom: none; }
+table.admin .item-meta { font-size: 0.8rem; color: var(--ink-faint); }
+
+footer.site { border-top: 1px solid var(--line); padding: 32px 28px; text-align: center; color: var(--ink-faint); font-size: 0.82rem; }
 </style>
 </head>
 <body>
 
 <header class="site">
   <div class="site-inner">
-    <span class="brand">Lost<span>&amp;</span>Found</span>
+    <div class="brand">
+      <span class="brand-mark"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M30 70 L30 34 Q30 26 38 26 L62 26 Q70 26 70 34 L70 70 L58 60 L50 70 L42 60 Z" fill="#b98a2e"/></svg></span>
+      <span class="brand-name">Lost &amp; Found</span>
+    </div>
     <nav class="main">
       <a data-view="home" class="active">Home</a>
-      <a data-view="report">Report an item</a>
-      <a data-view="browse">Browse &amp; claim</a>
+      <a data-view="report">Report</a>
+      <a data-view="browse">Browse</a>
       <a data-view="admin">Admin</a>
     </nav>
   </div>
@@ -218,21 +351,23 @@ footer.site { border-top: 1px solid var(--line); padding: 24px; text-align: cent
   <div id="global-error" class="msg err" style="display:none; margin-bottom: 20px;"></div>
 
   <section id="view-home" class="view">
-    <h1>A simple place to report and reclaim what campus loses.</h1>
-    <p class="lead">Report a lost or found item in under a minute, search what other students have logged, and submit a claim once you find a match. Every claim is checked by an admin before an item is marked returned. Data is stored permanently in MongoDB.</p>
-    <div class="stats" id="home-stats"></div>
-    <div style="margin-bottom: 44px;">
+    <h1>Everything campus loses, in one place.</h1>
+    <p class="lead">Report a lost or found item in under a minute, search what other students have logged, and submit a claim once you find a match. Every claim is checked by an admin before an item is marked returned.</p>
+    <div style="margin-bottom: 48px; display: flex; gap: 12px; flex-wrap: wrap;">
       <a data-view="report" class="btn action">Report an item</a>
-      <a data-view="browse" class="btn secondary" style="margin-left: 10px;">Browse items</a>
+      <a data-view="browse" class="btn secondary">Browse items</a>
     </div>
+
+    <div class="stats" id="home-stats"></div>
+
     <h2>How it works</h2>
     <div class="workflow">
-      <div><b>1. Report</b>Enter details of a lost or found item</div>
-      <div><b>2. Listed</b>It's added to the shared database</div>
-      <div><b>3. Search</b>Others browse and find a match</div>
-      <div><b>4. Claim</b>The finder or owner submits a claim</div>
-      <div><b>5. Verify</b>An admin checks the claim</div>
-      <div><b>6. Returned</b>Item is marked returned to its owner</div>
+      <div><b>Report</b>Enter details of a lost or found item</div>
+      <div><b>Listed</b>It's added to the shared database</div>
+      <div><b>Search</b>Others browse and find a match</div>
+      <div><b>Claim</b>The finder or owner submits a claim</div>
+      <div><b>Verify</b>An admin checks the claim</div>
+      <div><b>Returned</b>Item is marked returned to its owner</div>
     </div>
   </section>
 
@@ -244,16 +379,20 @@ footer.site { border-top: 1px solid var(--line); padding: 24px; text-align: cent
       <button type="button" id="type-found" class="is-found">I found something</button>
     </div>
     <form id="report-form" class="card">
-      <div class="field"><label for="title">Item title</label><input type="text" id="title" name="title" placeholder="e.g. Blue water bottle" required /></div>
-      <div class="field"><label for="category">Category</label>
-        <select id="category" name="category">
-          <option>Personal item</option><option>Electronics</option><option>ID / Documents</option>
-          <option>Books &amp; stationery</option><option>Clothing</option><option>Keys</option><option>Other</option>
-        </select>
+      <div class="field-grid two" style="margin-bottom: 18px;">
+        <div class="field"><label for="title">Item title</label><input type="text" id="title" name="title" placeholder="e.g. Blue water bottle" required /></div>
+        <div class="field"><label for="category">Category</label>
+          <select id="category" name="category">
+            <option>Personal item</option><option>Electronics</option><option>ID / Documents</option>
+            <option>Books &amp; stationery</option><option>Clothing</option><option>Keys</option><option>Other</option>
+          </select>
+        </div>
       </div>
       <div class="field"><label for="description">Description</label><textarea id="description" name="description" placeholder="Color, brand, distinguishing marks, contents..." required></textarea></div>
-      <div class="field"><label for="location">Location</label><input type="text" id="location" name="location" placeholder="e.g. Main Library, 2nd floor" required /></div>
-      <div class="field"><label for="date">Date</label><input type="date" id="date" name="date" required /></div>
+      <div class="field-grid two" style="margin-bottom: 18px;">
+        <div class="field"><label for="location">Location</label><input type="text" id="location" name="location" placeholder="e.g. Main Library, 2nd floor" required /></div>
+        <div class="field"><label for="date">Date</label><input type="date" id="date" name="date" required /></div>
+      </div>
       <div class="field"><label for="contact">Your contact (email or phone)</label><input type="text" id="contact" name="contact" placeholder="you@campus.edu" required /></div>
       <button type="submit" class="btn action">Submit report</button>
     </form>
@@ -278,7 +417,7 @@ footer.site { border-top: 1px solid var(--line); padding: 24px; text-align: cent
     <p class="lead">Review pending claims and confirm ownership before marking an item as returned.</p>
     <div id="admin-gate">
       <form id="admin-login" class="card">
-        <div class="field"><label for="admin-pass">Admin password</label><input type="password" id="admin-pass" placeholder="Demo password: admin123" /></div>
+        <div class="field"><label for="admin-pass">Admin password</label><input type="password" id="admin-pass" placeholder="Enter admin password" /></div>
         <button type="submit" class="btn action">Log in</button>
       </form>
     </div>
@@ -292,7 +431,7 @@ footer.site { border-top: 1px solid var(--line); padding: 24px; text-align: cent
   </section>
 </main>
 
-<footer class="site">Campus Lost &amp; Found — semester project · data stored permanently in MongoDB</footer>
+<footer class="site">Campus Lost &amp; Found — data stored permanently in the database</footer>
 
 <script>
 var ADMIN_KEY = "lf_admin_pass";
@@ -370,10 +509,13 @@ function escapeHTML(s) {
 function itemCardHTML(item) {
   var showClaimBtn = item.status === "active";
   var html = '<div class="item-card ' + item.type + '">';
+  html += '<div class="item-card-top">';
   html += '<span class="item-tag ' + tagClass(item) + '">' + statusLabel(item) + "</span>";
+  html += '<span class="item-category">' + escapeHTML(item.category) + "</span>";
+  html += "</div>";
   html += "<h3>" + escapeHTML(item.title) + "</h3>";
-  html += '<p class="item-meta">' + escapeHTML(item.category) + " · " + escapeHTML(item.location) + " · " + fmtDate(item.date) + "</p>";
   html += '<p class="item-desc">' + escapeHTML(item.description) + "</p>";
+  html += '<div class="item-meta-row"><span class="meta-item">' + escapeHTML(item.location) + '</span><span class="meta-item">' + fmtDate(item.date) + "</span></div>";
   if (showClaimBtn) html += '<button class="btn action small" data-claim="' + item._id + '">Claim this item</button>';
   if (item.claim) html += '<div class="claim-note"><b>Claim:</b> ' + escapeHTML(item.claim.name) + " — " + escapeHTML(item.claim.note || "") + "</div>";
   html += "</div>";
@@ -412,9 +554,9 @@ function renderHome() {
   var pending = itemsCache.filter(function (i) { return i.status === "claimed"; }).length;
   var returned = itemsCache.filter(function (i) { return i.status === "returned"; }).length;
   el.innerHTML =
-    '<div class="stat"><b>' + active + "</b><span>Active listings</span></div>" +
-    '<div class="stat"><b>' + pending + "</b><span>Claims pending</span></div>" +
-    '<div class="stat"><b>' + returned + "</b><span>Items returned</span></div>";
+    '<div class="stat active"><b>' + active + "</b><span>Active listings</span></div>" +
+    '<div class="stat pending"><b>' + pending + "</b><span>Claims pending</span></div>" +
+    '<div class="stat returned"><b>' + returned + "</b><span>Items returned</span></div>";
 }
 
 function initReportForm() {
@@ -531,7 +673,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initAdmin();
 
   refresh().then(function () { showView("home"); }).catch(function () {
-    showGlobalError("Couldn't reach the server. Is it running, and is MONGODB_URI set correctly?");
+    showGlobalError("Couldn't reach the server. Is it running, and is DATABASE_URL set correctly?");
     showView("home");
   });
 
@@ -542,6 +684,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>`;
+
 app.get("*", (req, res) => {
   res.type("html").send(PAGE);
 });
