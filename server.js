@@ -1,36 +1,58 @@
 /* =========================================================
-   Campus Lost & Found — single-file version
-   Everything (server, database schema, API routes, and the
+   Campus Lost & Found — single-file version (PostgreSQL)
+   Everything (server, database setup, API routes, and the
    entire frontend) lives in this one file. Only package.json,
    .gitignore and .env.example sit alongside it.
    ========================================================= */
 
 require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
+const { Pool } = require("pg");
 
 const app = express();
 app.use(express.json());
 
 // ---------- Database ----------
-const claimSchema = new mongoose.Schema({ name: String, note: String }, { _id: false });
+const connectionString = process.env.DATABASE_URL;
+const pool = new Pool({
+  connectionString,
+  ssl: connectionString && connectionString.includes("localhost") ? false : { rejectUnauthorized: false },
+});
 
-const itemSchema = new mongoose.Schema(
-  {
-    type: { type: String, enum: ["lost", "found"], required: true },
-    title: { type: String, required: true },
-    category: { type: String, default: "Other" },
-    description: { type: String, required: true },
-    location: { type: String, required: true },
-    date: { type: String, required: true },
-    contact: { type: String, required: true },
-    status: { type: String, enum: ["active", "claimed", "returned"], default: "active" },
-    claim: { type: claimSchema, default: null },
-  },
-  { timestamps: true }
-);
+async function initDb() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS items (
+      id SERIAL PRIMARY KEY,
+      type TEXT NOT NULL CHECK (type IN ('lost','found')),
+      title TEXT NOT NULL,
+      category TEXT DEFAULT 'Other',
+      description TEXT NOT NULL,
+      location TEXT NOT NULL,
+      date TEXT NOT NULL,
+      contact TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','claimed','returned')),
+      claim_name TEXT,
+      claim_note TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+  `);
+}
 
-const Item = mongoose.model("Item", itemSchema);
+function mapRow(row) {
+  return {
+    _id: String(row.id),
+    type: row.type,
+    title: row.title,
+    category: row.category,
+    description: row.description,
+    location: row.location,
+    date: row.date,
+    contact: row.contact,
+    status: row.status,
+    claim: row.claim_name ? { name: row.claim_name, note: row.claim_note } : null,
+    createdAt: row.created_at,
+  };
+}
 
 function requireAdmin(req, res, next) {
   const pass = req.header("x-admin-password");
@@ -41,8 +63,8 @@ function requireAdmin(req, res, next) {
 // ---------- API routes ----------
 app.get("/api/items", async (req, res) => {
   try {
-    const items = await Item.find().sort({ createdAt: -1 });
-    res.json(items);
+    const result = await pool.query("SELECT * FROM items ORDER BY created_at DESC");
+    res.json(result.rows.map(mapRow));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -54,8 +76,12 @@ app.post("/api/items", async (req, res) => {
     if (!type || !title || !description || !location || !date || !contact) {
       return res.status(400).json({ error: "Missing required fields" });
     }
-    const item = await Item.create({ type, title, category, description, location, date, contact });
-    res.status(201).json(item);
+    const result = await pool.query(
+      `INSERT INTO items (type, title, category, description, location, date, contact)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [type, title, category || "Other", description, location, date, contact]
+    );
+    res.status(201).json(mapRow(result.rows[0]));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -65,32 +91,33 @@ app.patch("/api/items/:id/claim", async (req, res) => {
   try {
     const { name, note } = req.body;
     if (!name || !note) return res.status(400).json({ error: "Name and note are required" });
-    const item = await Item.findByIdAndUpdate(
-      req.params.id,
-      { status: "claimed", claim: { name, note } },
-      { new: true }
+    const result = await pool.query(
+      `UPDATE items SET status = 'claimed', claim_name = $1, claim_note = $2 WHERE id = $3 RETURNING *`,
+      [name, note, req.params.id]
     );
-    if (!item) return res.status(404).json({ error: "Item not found" });
-    res.json(item);
+    if (!result.rows[0]) return res.status(404).json({ error: "Item not found" });
+    res.json(mapRow(result.rows[0]));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
 app.patch("/api/items/:id/verify", requireAdmin, async (req, res) => {
-  const item = await Item.findByIdAndUpdate(req.params.id, { status: "returned" }, { new: true });
-  if (!item) return res.status(404).json({ error: "Item not found" });
-  res.json(item);
+  const result = await pool.query(
+    `UPDATE items SET status = 'returned' WHERE id = $1 RETURNING *`,
+    [req.params.id]
+  );
+  if (!result.rows[0]) return res.status(404).json({ error: "Item not found" });
+  res.json(mapRow(result.rows[0]));
 });
 
 app.patch("/api/items/:id/reject", requireAdmin, async (req, res) => {
-  const item = await Item.findByIdAndUpdate(
-    req.params.id,
-    { status: "active", claim: null },
-    { new: true }
+  const result = await pool.query(
+    `UPDATE items SET status = 'active', claim_name = NULL, claim_note = NULL WHERE id = $1 RETURNING *`,
+    [req.params.id]
   );
-  if (!item) return res.status(404).json({ error: "Item not found" });
-  res.json(item);
+  if (!result.rows[0]) return res.status(404).json({ error: "Item not found" });
+  res.json(mapRow(result.rows[0]));
 });
 
 app.post("/api/admin/login", (req, res) => {
@@ -515,28 +542,25 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 </body>
 </html>`;
-
 app.get("*", (req, res) => {
   res.type("html").send(PAGE);
 });
 
 // ---------- Start ----------
 const PORT = process.env.PORT || 3000;
-const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
+if (!connectionString) {
   console.error(
-    "Missing MONGODB_URI. Copy .env.example to .env and fill in your MongoDB Atlas connection string."
+    "Missing DATABASE_URL. Copy .env.example to .env and fill in your Postgres connection string."
   );
   process.exit(1);
 }
 
-mongoose
-  .connect(MONGODB_URI)
+initDb()
   .then(() => {
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch((err) => {
-    console.error("MongoDB connection error:", err.message);
+    console.error("Database connection error:", err.message);
     process.exit(1);
   });
