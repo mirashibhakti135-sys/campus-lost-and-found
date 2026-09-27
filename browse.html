@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Browse items — Lost &amp; Found</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="site">
+  <div class="site-inner">
+    <a href="index.html" class="brand">Lost<span>&amp;</span>Found</a>
+    <nav class="main">
+      <a href="index.html">Home</a>
+      <a href="report.html">Report an item</a>
+      <a href="browse.html" class="active">Browse &amp; claim</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Browse reported items</h1>
+  <p class="lead">Search by keyword, or filter by type and category. Found a match? Submit a claim and an admin will verify it.</p>
+
+  <div class="filters">
+    <input type="text" id="q" placeholder="Search by name, description or location..." />
+    <select id="filter-type">
+      <option value="all">All types</option>
+      <option value="lost">Lost</option>
+      <option value="found">Found</option>
+    </select>
+    <select id="filter-category">
+      <option value="all">All categories</option>
+      <option>Personal item</option>
+      <option>Electronics</option>
+      <option>ID / Documents</option>
+      <option>Books &amp; stationery</option>
+      <option>Clothing</option>
+      <option>Keys</option>
+      <option>Other</option>
+    </select>
+  </div>
+
+  <div class="item-grid" id="item-grid"></div>
+</main>
+
+<footer class="site">Campus Lost &amp; Found — semester project · data stored locally in your browser</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

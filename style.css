@@ -1,0 +1,383 @@
+/* ===== Campus Lost & Found — shared styles =====
+   Palette: warm paper background, ink navy text,
+   teal = found items, clay = lost items, yellow = action/claim
+*/
+
+:root {
+  --paper: #eeece3;
+  --paper-raised: #f7f5ee;
+  --ink: #23262b;
+  --ink-soft: #5c6067;
+  --line: #d8d4c7;
+  --found: #2f6f6d;
+  --found-bg: #e4efee;
+  --lost: #b5502e;
+  --lost-bg: #f6e7df;
+  --action: #e2b93b;
+  --action-ink: #23262b;
+  --danger: #b5502e;
+  --radius: 4px;
+  --serif: "Lora", Georgia, "Times New Roman", serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", "Courier New", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.5;
+}
+
+a { color: inherit; }
+
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------- header / nav ---------- */
+header.site {
+  border-bottom: 2px solid var(--ink);
+  background: var(--paper-raised);
+}
+
+.site-inner {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 20px 24px;
+  max-width: 980px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.brand {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.brand span { color: var(--found); }
+
+nav.main a {
+  text-decoration: none;
+  color: var(--ink-soft);
+  margin-left: 22px;
+  font-size: 0.95rem;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 2px;
+}
+
+nav.main a:hover,
+nav.main a.active {
+  color: var(--ink);
+  border-bottom-color: var(--action);
+}
+
+/* ---------- generic layout ---------- */
+main { padding: 48px 0 80px; }
+
+h1 {
+  font-family: var(--serif);
+  font-size: 2.1rem;
+  line-height: 1.15;
+  margin: 0 0 8px;
+}
+
+h2 {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  margin: 0 0 16px;
+}
+
+p.lead {
+  color: var(--ink-soft);
+  max-width: 60ch;
+  margin: 0 0 32px;
+}
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-block;
+  border: 2px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper-raised);
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-family: var(--sans);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn.secondary {
+  background: transparent;
+  color: var(--ink);
+}
+
+.btn.action {
+  background: var(--action);
+  border-color: var(--action);
+  color: var(--action-ink);
+  font-weight: 600;
+}
+
+.btn.small { padding: 6px 12px; font-size: 0.85rem; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ---------- forms ---------- */
+form.card {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px;
+  max-width: 560px;
+}
+
+.field { margin-bottom: 18px; }
+
+.field label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.field textarea { min-height: 90px; resize: vertical; }
+
+.toggle-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.toggle-row button {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid var(--line);
+  background: #fff;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-weight: 600;
+}
+
+.toggle-row button.is-lost.on {
+  border-color: var(--lost);
+  background: var(--lost-bg);
+  color: var(--lost);
+}
+
+.toggle-row button.is-found.on {
+  border-color: var(--found);
+  background: var(--found-bg);
+  color: var(--found);
+}
+
+.msg {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  display: none;
+}
+
+.msg.ok { display: block; background: var(--found-bg); color: var(--found); }
+.msg.err { display: block; background: var(--lost-bg); color: var(--lost); }
+
+/* ---------- search / filters ---------- */
+.filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.filters input,
+.filters select {
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-family: var(--sans);
+  background: #fff;
+}
+
+.filters input[type="text"] { flex: 1; min-width: 200px; }
+
+/* ---------- item cards ---------- */
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.item-card {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+.item-card.lost { border-left-color: var(--lost); }
+.item-card.found { border-left-color: var(--found); }
+
+.item-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-family: var(--mono);
+  letter-spacing: 0.02em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  margin-bottom: 10px;
+}
+
+.item-tag.lost { background: var(--lost-bg); color: var(--lost); }
+.item-tag.found { background: var(--found-bg); color: var(--found); }
+.item-tag.claimed { background: #eee3c6; color: #8a6d1d; }
+.item-tag.returned { background: #dde2e0; color: var(--ink-soft); }
+
+.item-card h3 {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  margin: 0 0 6px;
+}
+
+.item-meta {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin: 0 0 10px;
+}
+
+.item-desc {
+  font-size: 0.9rem;
+  margin: 0 0 14px;
+}
+
+.empty-state {
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+/* ---------- workflow strip (home page) ---------- */
+.workflow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 36px 0 44px;
+}
+
+.workflow div {
+  flex: 1;
+  min-width: 140px;
+  padding: 16px 14px;
+  border-right: 1px solid var(--line);
+  background: var(--paper-raised);
+  font-size: 0.85rem;
+}
+
+.workflow div:last-child { border-right: none; }
+.workflow div b { display: block; font-family: var(--serif); font-size: 0.95rem; margin-bottom: 4px; }
+
+.stats {
+  display: flex;
+  gap: 28px;
+  margin: 8px 0 36px;
+  flex-wrap: wrap;
+}
+
+.stat b {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.8rem;
+}
+
+.stat span { font-size: 0.8rem; color: var(--ink-soft); }
+
+/* ---------- admin table ---------- */
+table.admin {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+table.admin th,
+table.admin td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+table.admin th { color: var(--ink-soft); font-weight: 500; font-size: 0.8rem; }
+
+.claim-note {
+  background: #fff9e8;
+  border: 1px solid var(--action);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  margin-top: 6px;
+}
+
+footer.site {
+  border-top: 1px solid var(--line);
+  padding: 24px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 640px) {
+  .site-inner { flex-direction: column; align-items: flex-start; }
+  nav.main a { margin-left: 0; margin-right: 18px; }
+}
+
+/* ---------- setup notice (shown until firebase-config.js is filled in) ---------- */
+.setup-notice {
+  display: none;
+  background: #fff9e8;
+  border: 1px solid var(--action);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  max-width: 640px;
+  margin-bottom: 32px;
+}
+.setup-notice h2 { margin-top: 0; }
+.setup-notice code {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-family: var(--mono);
+  font-size: 0.85em;
+}

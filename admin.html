@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin — Lost &amp; Found</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="site">
+  <div class="site-inner">
+    <a href="index.html" class="brand">Lost<span>&amp;</span>Found</a>
+    <nav class="main">
+      <a href="index.html">Home</a>
+      <a href="report.html">Report an item</a>
+      <a href="browse.html">Browse &amp; claim</a>
+      <a href="admin.html" class="active">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Admin verification</h1>
+  <p class="lead">Review pending claims and confirm ownership before marking an item as returned.</p>
+
+  <div id="admin-gate">
+    <form id="admin-login" class="card">
+      <div class="field">
+        <label for="admin-pass">Admin password</label>
+        <input type="password" id="admin-pass" placeholder="Demo password: admin123" />
+      </div>
+      <button type="submit" class="btn action">Log in</button>
+    </form>
+  </div>
+
+  <div id="admin-panel" style="display:none;">
+    <h2>Claims awaiting verification</h2>
+    <table class="admin">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Type</th>
+          <th>Claim</th>
+          <th>Contact</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="admin-body"></tbody>
+    </table>
+  </div>
+</main>
+
+<footer class="site">Campus Lost &amp; Found — semester project · data stored locally in your browser</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Report an item — Lost &amp; Found</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="site">
+  <div class="site-inner">
+    <a href="index.html" class="brand">Lost<span>&amp;</span>Found</a>
+    <nav class="main">
+      <a href="index.html">Home</a>
+      <a href="report.html" class="active">Report an item</a>
+      <a href="browse.html">Browse &amp; claim</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Report an item</h1>
+  <p class="lead">Choose whether you lost something or found something, then fill in what you know. More detail makes a match easier.</p>
+
+  <div class="toggle-row">
+    <button type="button" id="type-lost" class="is-lost">I lost something</button>
+    <button type="button" id="type-found" class="is-found">I found something</button>
+  </div>
+
+  <form id="report-form" class="card">
+    <div class="field">
+      <label for="title">Item title</label>
+      <input type="text" id="title" name="title" placeholder="e.g. Blue water bottle" required />
+    </div>
+
+    <div class="field">
+      <label for="category">Category</label>
+      <select id="category" name="category">
+        <option>Personal item</option>
+        <option>Electronics</option>
+        <option>ID / Documents</option>
+        <option>Books &amp; stationery</option>
+        <option>Clothing</option>
+        <option>Keys</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" placeholder="Color, brand, distinguishing marks, contents..." required></textarea>
+    </div>
+
+    <div class="field">
+      <label for="location">Location</label>
+      <input type="text" id="location" name="location" placeholder="e.g. Main Library, 2nd floor" required />
+    </div>
+
+    <div class="field">
+      <label for="date">Date</label>
+      <input type="date" id="date" name="date" required />
+    </div>
+
+    <div class="field">
+      <label for="contact">Your contact (email or phone)</label>
+      <input type="text" id="contact" name="contact" placeholder="you@campus.edu" required />
+    </div>
+
+    <button type="submit" class="btn action">Submit report</button>
+  </form>
+</main>
+
+<footer class="site">Campus Lost &amp; Found — semester project · data stored locally in your browser</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

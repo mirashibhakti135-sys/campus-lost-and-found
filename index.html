@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Campus Lost &amp; Found</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="site">
+  <div class="site-inner">
+    <a href="#" class="brand" style="pointer-events:none;">Lost<span>&amp;</span>Found</a>
+    <nav class="main">
+      <a href="#" data-view="home" class="active">Home</a>
+      <a href="#" data-view="report">Report an item</a>
+      <a href="#" data-view="browse">Browse &amp; claim</a>
+      <a href="#" data-view="admin">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div id="global-error" class="msg err" style="display:none; margin-bottom: 20px;"></div>
+
+  <section id="view-home" class="view">
+    <h1>A simple place to report and reclaim what campus loses.</h1>
+    <p class="lead">
+      Report a lost or found item in under a minute, search what other
+      students have logged, and submit a claim once you find a match.
+      Every claim is checked by an admin before an item is marked returned.
+      Data is stored permanently in MongoDB, not just this browser.
+    </p>
+
+    <div class="stats" id="home-stats"></div>
+
+    <div style="margin-bottom: 44px;">
+      <a href="#" data-view="report" class="btn action">Report an item</a>
+      <a href="#" data-view="browse" class="btn secondary" style="margin-left: 10px;">Browse items</a>
+    </div>
+
+    <h2>How it works</h2>
+    <div class="workflow">
+      <div><b>1. Report</b>Enter details of a lost or found item</div>
+      <div><b>2. Listed</b>It's added to the shared database</div>
+      <div><b>3. Search</b>Others browse and find a match</div>
+      <div><b>4. Claim</b>The finder or owner submits a claim</div>
+      <div><b>5. Verify</b>An admin checks the claim</div>
+      <div><b>6. Returned</b>Item is marked returned to its owner</div>
+    </div>
+  </section>
+
+  <section id="view-report" class="view" style="display:none;">
+    <h1>Report an item</h1>
+    <p class="lead">Choose whether you lost something or found something, then fill in what you know.</p>
+
+    <div class="toggle-row">
+      <button type="button" id="type-lost" class="is-lost">I lost something</button>
+      <button type="button" id="type-found" class="is-found">I found something</button>
+    </div>
+
+    <form id="report-form" class="card">
+      <div class="field">
+        <label for="title">Item title</label>
+        <input type="text" id="title" name="title" placeholder="e.g. Blue water bottle" required />
+      </div>
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category" name="category">
+          <option>Personal item</option>
+          <option>Electronics</option>
+          <option>ID / Documents</option>
+          <option>Books &amp; stationery</option>
+          <option>Clothing</option>
+          <option>Keys</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" placeholder="Color, brand, distinguishing marks, contents..." required></textarea>
+      </div>
+      <div class="field">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" placeholder="e.g. Main Library, 2nd floor" required />
+      </div>
+      <div class="field">
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" required />
+      </div>
+      <div class="field">
+        <label for="contact">Your contact (email or phone)</label>
+        <input type="text" id="contact" name="contact" placeholder="you@campus.edu" required />
+      </div>
+      <button type="submit" class="btn action">Submit report</button>
+    </form>
+  </section>
+
+  <section id="view-browse" class="view" style="display:none;">
+    <h1>Browse reported items</h1>
+    <p class="lead">Search by keyword, or filter by type and category.</p>
+
+    <div class="filters">
+      <input type="text" id="q" placeholder="Search by name, description or location..." />
+      <select id="filter-type">
+        <option value="all">All types</option>
+        <option value="lost">Lost</option>
+        <option value="found">Found</option>
+      </select>
+      <select id="filter-category">
+        <option value="all">All categories</option>
+        <option>Personal item</option>
+        <option>Electronics</option>
+        <option>ID / Documents</option>
+        <option>Books &amp; stationery</option>
+        <option>Clothing</option>
+        <option>Keys</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="item-grid" id="item-grid"></div>
+  </section>
+
+  <section id="view-admin" class="view" style="display:none;">
+    <h1>Admin verification</h1>
+    <p class="lead">Review pending claims and confirm ownership before marking an item as returned.</p>
+
+    <div id="admin-gate">
+      <form id="admin-login" class="card">
+        <div class="field">
+          <label for="admin-pass">Admin password</label>
+          <input type="password" id="admin-pass" placeholder="Demo password: admin123" />
+        </div>
+        <button type="submit" class="btn action">Log in</button>
+      </form>
+    </div>
+
+    <div id="admin-panel" style="display:none;">
+      <h2>Claims awaiting verification</h2>
+      <table class="admin">
+        <thead>
+          <tr><th>Item</th><th>Type</th><th>Claim</th><th>Contact</th><th>Action</th></tr>
+        </thead>
+        <tbody id="admin-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site">Campus Lost &amp; Found — semester project · data stored permanently in MongoDB</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
