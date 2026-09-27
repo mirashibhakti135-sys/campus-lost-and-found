@@ -1,7 +1,7 @@
 {
   "name": "campus-lost-and-found",
   "version": "1.0.0",
-  "description": "Campus Lost & Found — semester project (Node/Express + MongoDB, deployed on Render)",
+  "description": "Campus Lost & Found — single-file version (Node/Express + MongoDB)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
