@@ -282,6 +282,12 @@ form.card {
 .item-tag.found { background: var(--found-bg); color: var(--found); }
 .item-tag.claimed { background: var(--gold-bg); color: var(--gold); }
 .item-tag.returned { background: #e7e5df; color: var(--ink-soft); }
+.item-tag.expired { background: #e7e5df; color: var(--ink-soft); border: 1px dashed var(--ink-faint); }
+.item-card.expired { border-top-color: var(--ink-faint); }
+.expired-note {
+  background: var(--bg); border-left: 3px solid var(--ink-faint); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 10px 14px; font-size: 0.85rem; margin-bottom: 14px; color: var(--ink-soft);
+}
 .item-category { font-size: 0.78rem; color: var(--ink-faint); }
 .item-card h3 { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; margin: 0 0 8px; letter-spacing: -0.01em; }
 .item-desc { font-size: 0.9rem; color: var(--ink-soft); margin: 0 0 14px; }
@@ -425,6 +431,7 @@ footer.site { border-top: 1px solid var(--line); padding: 32px 28px; text-align:
         <option value="title">Title (A-Z)</option>
       </select>
       <label class="mine-toggle"><input type="checkbox" id="filter-mine" /> My reports</label>
+      <label class="mine-toggle"><input type="checkbox" id="hide-expired" /> Hide expired</label>
       <div class="mine-hint" id="mine-hint" style="display:none;"></div>
     </div>
     <div class="item-grid" id="item-grid"></div>
@@ -454,6 +461,7 @@ footer.site { border-top: 1px solid var(--line); padding: 32px 28px; text-align:
 <script>
 var ADMIN_KEY = "lf_admin_pass";
 var MINE_KEY = "lf_my_contact";
+var EXPIRY_DAYS = 30;
 var itemsCache = [];
 
 function apiGet(url) {
@@ -512,11 +520,12 @@ function askMyContact(force) {
   return true;
 }
 
-function searchItems(q, type, category, mine) {
+function searchItems(q, type, category, mine, hideExpired) {
   q = (q || "").trim().toLowerCase();
   var me = mine ? normContact(getMyContact()) : "";
   return itemsCache.filter(function (item) {
     if (mine && normContact(item.contact) !== me) return false;
+    if (hideExpired && isExpired(item)) return false;
     if (type !== "all" && item.type !== type) return false;
     if (category !== "all" && item.category !== category) return false;
     if (!q) return true;
@@ -540,6 +549,15 @@ function sortItems(items, mode) {
   return list;
 }
 
+function daysOld(item) {
+  var t = new Date(item.createdAt).getTime();
+  if (!t) return 0;
+  return Math.floor((Date.now() - t) / 86400000);
+}
+function isExpired(item) {
+  return item.status === "active" && daysOld(item) > EXPIRY_DAYS;
+}
+
 function fmtDate(d) {
   if (!d) return "—";
   return new Date(d).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
@@ -547,11 +565,13 @@ function fmtDate(d) {
 function statusLabel(item) {
   if (item.status === "returned") return "Returned";
   if (item.status === "claimed") return "Claim pending";
+  if (isExpired(item)) return "Unclaimed";
   return item.type === "lost" ? "Lost" : "Found";
 }
 function tagClass(item) {
   if (item.status === "returned") return "returned";
   if (item.status === "claimed") return "claimed";
+  if (isExpired(item)) return "expired";
   return item.type;
 }
 function escapeHTML(s) {
@@ -561,7 +581,7 @@ function escapeHTML(s) {
 }
 function itemCardHTML(item) {
   var showClaimBtn = item.status === "active";
-  var html = '<div class="item-card ' + item.type + '">';
+  var html = '<div class="item-card ' + (isExpired(item) ? "expired" : item.type) + '">';
   html += '<div class="item-card-top">';
   html += '<span class="item-tag ' + tagClass(item) + '">' + statusLabel(item) + "</span>";
   html += '<span class="item-category">' + escapeHTML(item.category) + "</span>";
@@ -569,6 +589,7 @@ function itemCardHTML(item) {
   html += "<h3>" + escapeHTML(item.title) + "</h3>";
   html += '<p class="item-desc">' + escapeHTML(item.description) + "</p>";
   html += '<div class="item-meta-row"><span class="meta-item">' + escapeHTML(item.location) + '</span><span class="meta-item">' + fmtDate(item.date) + "</span></div>";
+  if (isExpired(item)) html += '<div class="expired-note">Listed ' + daysOld(item) + ' days ago and still unclaimed. Please contact the admin.</div>';
   if (showClaimBtn) html += '<button class="btn action small" data-claim="' + item._id + '">Claim this item</button>';
   if (item.claim) html += '<div class="claim-note"><b>Claim:</b> ' + escapeHTML(item.claim.name) + " — " + escapeHTML(item.claim.note || "") + "</div>";
   html += "</div>";
@@ -672,7 +693,8 @@ function renderBrowse() {
     hint.style.display = "none";
   }
   var sortMode = document.getElementById("sort-by").value;
-  var items = sortItems(searchItems(q, type, category, mine), sortMode);
+  var hideExpired = document.getElementById("hide-expired").checked;
+  var items = sortItems(searchItems(q, type, category, mine, hideExpired), sortMode);
   grid.innerHTML = items.length ? items.map(itemCardHTML).join("") :
     '<div class="empty-state">' + (mine ? "You haven't reported anything with this contact yet." : "No items match your search yet. Try a different keyword or check back later.") + "</div>";
   grid.querySelectorAll("[data-claim]").forEach(function (btn) {
@@ -684,6 +706,7 @@ function initBrowseFilters() {
   document.getElementById("filter-type").addEventListener("change", renderBrowse);
   document.getElementById("filter-category").addEventListener("change", renderBrowse);
   document.getElementById("sort-by").addEventListener("change", renderBrowse);
+  document.getElementById("hide-expired").addEventListener("change", renderBrowse);
   document.getElementById("filter-mine").addEventListener("change", function () {
     if (this.checked && !askMyContact(false)) this.checked = false;
     renderBrowse();
