@@ -129,6 +129,7 @@ app.post("/api/admin/login", (req, res) => {
 });
 
 // ---------- Frontend (single page, embedded below) ----------
+// NOTE: this is a template literal. Do not use backticks or ${...} inside the frontend code.
 const PAGE = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -256,6 +257,15 @@ form.card {
   font-family: var(--sans); background: var(--surface); font-size: 0.92rem;
 }
 .filters input[type="text"] { flex: 1; min-width: 220px; }
+
+.mine-toggle {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px;
+  border: 1.5px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--surface); font-size: 0.92rem; cursor: pointer; user-select: none;
+}
+.filters .mine-toggle input { width: auto; margin: 0; padding: 0; }
+.mine-hint { width: 100%; font-size: 0.82rem; color: var(--ink-faint); }
+.mine-hint a { color: var(--ink); text-decoration: underline; cursor: pointer; }
 
 /* ---------- item cards ---------- */
 .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px; }
@@ -408,6 +418,8 @@ footer.site { border-top: 1px solid var(--line); padding: 32px 28px; text-align:
         <option value="all">All categories</option><option>Personal item</option><option>Electronics</option>
         <option>ID / Documents</option><option>Books &amp; stationery</option><option>Clothing</option><option>Keys</option><option>Other</option>
       </select>
+      <label class="mine-toggle"><input type="checkbox" id="filter-mine" /> My reports</label>
+      <div class="mine-hint" id="mine-hint" style="display:none;"></div>
     </div>
     <div class="item-grid" id="item-grid"></div>
   </section>
@@ -435,6 +447,7 @@ footer.site { border-top: 1px solid var(--line); padding: 32px 28px; text-align:
 
 <script>
 var ADMIN_KEY = "lf_admin_pass";
+var MINE_KEY = "lf_my_contact";
 var itemsCache = [];
 
 function apiGet(url) {
@@ -476,9 +489,28 @@ function rejectItem(id) {
 function adminLogin(password) {
   return apiSend("/api/admin/login", "POST", { password: password }).then(function (res) { return res.ok; });
 }
-function searchItems(q, type, category) {
+
+/* ---- "My reports" helpers ---- */
+function getMyContact() {
+  try { return localStorage.getItem(MINE_KEY) || ""; } catch (e) { return ""; }
+}
+function saveMyContact(c) {
+  try { localStorage.setItem(MINE_KEY, c); } catch (e) {}
+}
+function normContact(c) { return String(c || "").trim().toLowerCase(); }
+function askMyContact(force) {
+  if (getMyContact() && !force) return true;
+  var c = prompt("Enter the email or phone you used when reporting:", getMyContact());
+  if (!c || !c.trim()) return false;
+  saveMyContact(c.trim());
+  return true;
+}
+
+function searchItems(q, type, category, mine) {
   q = (q || "").trim().toLowerCase();
+  var me = mine ? normContact(getMyContact()) : "";
   return itemsCache.filter(function (item) {
+    if (mine && normContact(item.contact) !== me) return false;
     if (type !== "all" && item.type !== type) return false;
     if (category !== "all" && item.category !== category) return false;
     if (!q) return true;
@@ -573,6 +605,10 @@ function initReportForm() {
   foundBtn.addEventListener("click", function () { setType("found"); });
   setType("lost");
 
+  // Pre-fill contact if we remember it
+  var contactInput = document.getElementById("contact");
+  if (getMyContact()) contactInput.value = getMyContact();
+
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var data = Object.fromEntries(new FormData(form).entries());
@@ -584,7 +620,9 @@ function initReportForm() {
     btn.disabled = true;
     data.type = currentType;
     addItem(data).then(function () {
+      saveMyContact(data.contact.trim());
       form.reset();
+      contactInput.value = getMyContact();
       setType("lost");
       showMsg(form, "Reported — added to the list. You can find it on the Browse page.", "ok");
       btn.disabled = false;
@@ -600,9 +638,21 @@ function renderBrowse() {
   var q = document.getElementById("q").value;
   var type = document.getElementById("filter-type").value;
   var category = document.getElementById("filter-category").value;
-  var items = searchItems(q, type, category);
+  var mine = document.getElementById("filter-mine").checked;
+  var hint = document.getElementById("mine-hint");
+  if (mine) {
+    hint.style.display = "block";
+    hint.innerHTML = "Showing reports made with <b>" + escapeHTML(getMyContact()) + '</b> &middot; <a id="mine-change">not you? change</a>';
+    document.getElementById("mine-change").addEventListener("click", function () {
+      askMyContact(true);
+      renderBrowse();
+    });
+  } else {
+    hint.style.display = "none";
+  }
+  var items = searchItems(q, type, category, mine);
   grid.innerHTML = items.length ? items.map(itemCardHTML).join("") :
-    '<div class="empty-state">No items match your search yet. Try a different keyword or check back later.</div>';
+    '<div class="empty-state">' + (mine ? "You haven't reported anything with this contact yet." : "No items match your search yet. Try a different keyword or check back later.") + "</div>";
   grid.querySelectorAll("[data-claim]").forEach(function (btn) {
     btn.addEventListener("click", function () { openClaim(btn.dataset.claim); });
   });
@@ -611,6 +661,10 @@ function initBrowseFilters() {
   document.getElementById("q").addEventListener("input", renderBrowse);
   document.getElementById("filter-type").addEventListener("change", renderBrowse);
   document.getElementById("filter-category").addEventListener("change", renderBrowse);
+  document.getElementById("filter-mine").addEventListener("change", function () {
+    if (this.checked && !askMyContact(false)) this.checked = false;
+    renderBrowse();
+  });
 }
 function openClaim(id) {
   var name = prompt("Your name, for the claim record:");
