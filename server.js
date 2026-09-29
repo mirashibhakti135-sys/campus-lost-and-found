@@ -418,6 +418,12 @@ footer.site { border-top: 1px solid var(--line); padding: 32px 28px; text-align:
         <option value="all">All categories</option><option>Personal item</option><option>Electronics</option>
         <option>ID / Documents</option><option>Books &amp; stationery</option><option>Clothing</option><option>Keys</option><option>Other</option>
       </select>
+      <select id="sort-by" aria-label="Sort items">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="category">Category (A-Z)</option>
+        <option value="title">Title (A-Z)</option>
+      </select>
       <label class="mine-toggle"><input type="checkbox" id="filter-mine" /> My reports</label>
       <div class="mine-hint" id="mine-hint" style="display:none;"></div>
     </div>
@@ -517,6 +523,21 @@ function searchItems(q, type, category, mine) {
     var hay = (item.title + " " + item.description + " " + item.location).toLowerCase();
     return hay.indexOf(q) !== -1;
   });
+}
+
+function sortItems(items, mode) {
+  function time(i) { return new Date(i.createdAt).getTime() || 0; }
+  var list = items.slice();
+  list.sort(function (a, b) {
+    if (mode === "oldest") return time(a) - time(b);
+    if (mode === "category") {
+      var c = String(a.category).localeCompare(String(b.category));
+      return c !== 0 ? c : time(b) - time(a);
+    }
+    if (mode === "title") return String(a.title).localeCompare(String(b.title), undefined, { sensitivity: "base" });
+    return time(b) - time(a);
+  });
+  return list;
 }
 
 function fmtDate(d) {
@@ -650,7 +671,8 @@ function renderBrowse() {
   } else {
     hint.style.display = "none";
   }
-  var items = searchItems(q, type, category, mine);
+  var sortMode = document.getElementById("sort-by").value;
+  var items = sortItems(searchItems(q, type, category, mine), sortMode);
   grid.innerHTML = items.length ? items.map(itemCardHTML).join("") :
     '<div class="empty-state">' + (mine ? "You haven't reported anything with this contact yet." : "No items match your search yet. Try a different keyword or check back later.") + "</div>";
   grid.querySelectorAll("[data-claim]").forEach(function (btn) {
@@ -661,6 +683,7 @@ function initBrowseFilters() {
   document.getElementById("q").addEventListener("input", renderBrowse);
   document.getElementById("filter-type").addEventListener("change", renderBrowse);
   document.getElementById("filter-category").addEventListener("change", renderBrowse);
+  document.getElementById("sort-by").addEventListener("change", renderBrowse);
   document.getElementById("filter-mine").addEventListener("change", function () {
     if (this.checked && !askMyContact(false)) this.checked = false;
     renderBrowse();
